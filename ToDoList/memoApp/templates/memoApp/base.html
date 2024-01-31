@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>メモ帳</title>
+        <link rel = "stylesheet" type = "text/css" href = "{%static 'memoApp/css/style.css' %}">
+    </head>
+
+    <body>
+        <h1>メモ帳</h1>
+    <div class = "container">
+        {% block content %}{% endblock%}
+    </div>
+    <footer>
+        <div class = "wrapper">
+            <ul>
+              <p>参考に用いたwebサイト"</p>
+              <a href = "https://djangobrothers.com/tutorials/">DjangoBrothers</a>
+            </ul>
+        </div>
+          </footer>
+    </body>
+</html>

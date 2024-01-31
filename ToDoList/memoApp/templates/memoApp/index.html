@@ -1,0 +1,18 @@
+{% extends 'memoApp/base.html'%}
+
+{%block content%}
+
+  <h4><a class="btn" href="{% url 'memoApp:new_memo' %}">メモる</a></h4>
+  <h5>今日：{{dt_now}}</h5>
+{% for memo in memos %}
+<a href="{% url 'memoApp:detail' memo.id %}" class="memo-title">
+  <div>
+    {{ memo }}
+    <span class="updated_datetime">{{ memo.updated_datetime }}</span>
+  </div>
+</a>
+
+{% endfor %}
+
+{%endblock%}
+
