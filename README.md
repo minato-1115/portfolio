@@ -5,5 +5,7 @@
 ・python
 ・Django
 [構築方法]
-Djangoをダウンロード＆インストール
-仮想サーバーをdjango
+pythonとDjangoをダウンロード＆インストール
+作業したいディレクトリまで移動し、 python3 -m venv 仮想サーバーの名前　をコマンドラインで実行し仮想サーバーを構築する。
+<windowsの場合>
+
