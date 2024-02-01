@@ -18,3 +18,4 @@
 4.ToDoListまでディレクトリを移動し、`python manage.py runserver`　を実行し、サーバーを起動。
 
 5.`http://127.0.0.1:8000 `にアクセスし、起動。
+
