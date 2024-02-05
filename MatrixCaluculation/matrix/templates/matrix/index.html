@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <title>行列式</title>
+    <meta name="description" content="正方行列の線形代数に関する結果を簡単に求めることができます">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body class="container">
+    <h1>行列式/逆行列</h1>
+    <p>テーブルのサイズを決定してください</p>
+    <select id="table_size" onchange="changeTableSize()">
+        <option value="2">2×2の正方行列</option>
+        <option value="3">3×3の正方行列</option>
+        <option value="4">4×4の正方行列</option>
+        <option value="5">5×5の正方行列</option>
+        <option value="6">6×6の正方行列</option>
+        <option value="7">7×7の正方行列</option>
+    </select>
+    <p>数値を下のテーブルに代入してください</p>
+
+    <div id="tableContainer"></div>
+
+    <form id="m_table" onsubmit="console.log('Form submitted'); calculateResults(); return false;" action="{% url 'calculate' %}" method="POST">
+        {% csrf_token %}
+        <input type="submit" value="行列式/逆行列を計算する" class="calculate">
+    </form>
+
+    <p>行列式の計算結果</p>
+    <div id="determine">{{ determinant_result }}</div>
+
+    <p>逆行列の計算結果</p>
+    <div id="result_tableContainer"></div>
+
+<table>
+    {% for row in inverse_matrix_result %}
+    <tr>
+        {% for cell in row %}
+            <td>{{ cell }}</td>
+        {% endfor %}
+    </tr>
+{% endfor %}
+</table>
+
+    <script>
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        function changeTableSize() {
+            // 選択されたオプションの値を取得
+            var selectedSizeText = document.getElementById("table_size").options[document.getElementById("table_size").selectedIndex].text;
+
+            // テキスト内容からサイズを取得（"2×2"の形式から数字のみを抽出）
+            var selectedSize = parseInt(selectedSizeText.match(/\d+/)[0]);
+            createTable(selectedSize);
+        }
+
+        function createTable(selectedSize) {
+    var table = document.createElement("table");
+
+    for (var i = 0; i < selectedSize; i++) {
+        var row = table.insertRow();
+        for (var j = 0; j < selectedSize; j++) {
+            var cell = row.insertCell();
+            var cellId = "cell_" + i + "_" + j;
+            var input = document.createElement("input");
+            input.type = "text";
+            input.placeholder = "行列" + "(" + (parseInt(i) + 1) + "," + (parseInt(j) + 1) + ")";
+            input.name = cellId;
+            cell.appendChild(input);
+            cell.id = cellId;
+            
+        }
+    }
+
+    var tableContainer = document.getElementById("tableContainer");
+
+    // テーブルコンテナをクリアしてから新しいテーブルを追加
+    tableContainer.innerHTML = "";
+    tableContainer.appendChild(table);
+}
+        function createResultTable(data) {
+            var resultTable = document.createElement("table");
+            if (data.inverse_matrix_result && Array.isArray(data.inverse_matrix_result)) {
+                for (var i = 0; i < data.inverse_matrix_result.length; i++) {
+                    var row = resultTable.insertRow();
+                    for (var j = 0; j < data.inverse_matrix_result[i].length; j++) {
+                        var cell = row.insertCell();
+                        cell.textContent = data.inverse_matrix_result[i][j];
+                    }
+                }
+                return resultTable; // この行を追加
+            } else {
+                console.error('Inverse matrix result is undefined or not an array', data);
+                return resultTable;
+            }
+    }
+    
+    
+        function calculateResults() {
+            var selectedSize = document.getElementById("table_size").value;
+            var determinantContainer = document.getElementById("determine");
+            var resultTableContainer = document.getElementById("result_tableContainer");
+            var originalMatrixContainer = document.getElementById("original_matrix");
+            var formData = new FormData(document.getElementById('m_table'));
+            formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+            formData.append('table_size', selectedSize);
+            for (var i = 0; i < selectedSize; i++) {
+                for (var j = 0; j < selectedSize; j++) {
+                    var cellId = "cell_" + i + "_" + j;
+                    var inputValue = document.getElementById(cellId).querySelector('input').value;
+            if (inputValue === "") {
+                console.error("Input value is empty for cell (" + i + ", " + j + ")");
+                return;  // or handle the empty value as needed
+                                    }
+            console.log("Cell Value (" + i + ", " + j + "): " + inputValue);
+            formData.append(cellId, inputValue);
+                }
+            }
+            fetch('/calculate/', {
+                method: 'POST',
+                body: formData,
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    
+                    determinantContainer.innerHTML = "行列式の結果: " +  (data.determinant_result !== undefined ? data.determinant_result : "計算エラー");
+    
+                    var resultTable = createResultTable(data);
+    
+                    // テーブルが閉じられていない場合、閉じる
+                    if (resultTableContainer.firstChild) {
+                        resultTableContainer.removeChild(resultTableContainer.firstChild);
+                    }
+    
+                    resultTableContainer.appendChild(resultTable);
+                    
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    resultTableContainer.innerHTML = "計算エラーが発生しました。";
+                });
+        }
+        
+
+        window.onload = function () {
+            createTable("2");
+        };
+    </script>
+</body>
+
+</html>
