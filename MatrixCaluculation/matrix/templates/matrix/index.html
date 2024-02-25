@@ -5,9 +5,52 @@
     <title>行列式</title>
     <meta name="description" content="正方行列の線形代数に関する結果を簡単に求めることができます">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css' >
+    <title>Document</title>
+    <style>body {padding : 100px;}</style>
+    <style>
+        #determineresult {
+            font-size:50px;
+        }
+
+        
+        #Result{
+            border-bottom:solid;
+            border-color:2px solid #0bd
+        }
+        #calculate_button{
+            margin:10px;
+            padding: 10px;
+        }
+        #content_margin{
+            margin:10px;
+        }
+        #tableContainer{
+            margin-left:50px;
+           
+        }
+        #result_tableContainer{
+            margin-top:30px;
+            margin-left:50px;
+        }
+        #det{
+            font-size:50px;
+        }
+        #ex{
+            width: 10px; /* 横幅を300pxに設定 */
+            margin:30px;
+            display:flex;
+            align-items:center;
+        }
+    
+    </style>
 </head>
 
-<body class="container">
+<body>
+    <nav class = "navbar-expand-md navbar-dark bg-dark fixed-top" >
+        <h2 class = "navbar-brand"  >Matrix Calculation</h2>
+    </nav>
+<div class ='container'>
     <h1>行列式/逆行列</h1>
     <p>テーブルのサイズを決定してください</p>
     <select id="table_size" onchange="changeTableSize()">
@@ -18,22 +61,28 @@
         <option value="6">6×6の正方行列</option>
         <option value="7">7×7の正方行列</option>
     </select>
-    <p>数値を下のテーブルに代入してください</p>
+
+    <div id = "content_margin"><p>数値を下のテーブルに代入してください</p></div>
 
     <div id="tableContainer"></div>
-
+    <div id ="calculate_button">
     <form id="m_table" onsubmit="console.log('Form submitted'); calculateResults(); return false;" action="{% url 'calculate' %}" method="POST">
         {% csrf_token %}
         <input type="submit" value="行列式/逆行列を計算する" class="calculate">
     </form>
+</div>
 
-    <p>行列式の計算結果</p>
-    <div id="determine">{{ determinant_result }}</div>
+    <div id = "Result"><h4>行列式の計算結果</h3></div>
+<div id = "ex">
+    <div id = "determineresult"> <p>det=</p>  </div>    
+    <div id = "determineresult" ><p id="determine">{{ determinant_result }}</p></div>
+</div>
 
-    <p>逆行列の計算結果</p>
-    <div id="result_tableContainer"></div>
+<div id = "Result">
+    <h4>逆行列の計算結果</h4></div>
+    <div id="result_tableContainer" border = "1"></div>
 
-<table>
+<table border = "1">
     {% for row in inverse_matrix_result %}
     <tr>
         {% for cell in row %}
@@ -42,7 +91,7 @@
     </tr>
 {% endfor %}
 </table>
-
+</div>
     <script>
         function getCookie(name) {
             var cookieValue = null;
@@ -93,12 +142,17 @@
 }
         function createResultTable(data) {
             var resultTable = document.createElement("table");
+            resultTable.setAttribute("border","4");
             if (data.inverse_matrix_result && Array.isArray(data.inverse_matrix_result)) {
                 for (var i = 0; i < data.inverse_matrix_result.length; i++) {
                     var row = resultTable.insertRow();
                     for (var j = 0; j < data.inverse_matrix_result[i].length; j++) {
                         var cell = row.insertCell();
                         cell.textContent = data.inverse_matrix_result[i][j];
+                        cell.style.fontSize = "50px"; 
+                        cell.style.width= "100px"; 
+                        cell.style.margin= "20px"; 
+                         
                     }
                 }
                 return resultTable; // この行を追加
@@ -141,7 +195,7 @@
                 })
                 .then(data => {
                     
-                    determinantContainer.innerHTML = "行列式の結果: " +  (data.determinant_result !== undefined ? data.determinant_result : "計算エラー");
+                    determinantContainer.innerHTML =  (data.determinant_result !== undefined ? data.determinant_result : "計算エラー");
     
                     var resultTable = createResultTable(data);
     

@@ -35,7 +35,7 @@ def calculate(request):
         if matrix.shape[0] != matrix.shape[1]:
             return JsonResponse({'error': 'The matrix is not a square matrix'})
 
-        determinant_result = calculate_determinant(matrix)
+        determinant_result =  calculate_determinant(matrix)
         inverse_matrix_result = calculate_inverse_matrix(matrix)
         
 
